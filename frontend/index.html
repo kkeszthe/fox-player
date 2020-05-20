@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Fox Player</title>
+		<link rel="stylesheet" href="./assets/style.css" />
+	</head>
+	<body>
+		<div class="main">
+			<img src="./assets/foxplayer.png" alt="" id="logo" />
+			<img src="" alt="" id="coverart" />
+			<div id="playlist">
+				<h1>Playlist</h1>
+				<button>+</button>
+			</div>
+
+			<ol class="left list" multiple="multiple">
+				<li class="static">All tracks</li>
+				<li class="static">Favourites</li>
+			</ol>
+
+			<div id="actual"></div>
+			<ul class="right list"> </ul>
+			<div class="controller">
+				<button
+					><img src="./assets/rewind.svg" alt="rewind" id="rewind"
+				/></button>
+				<button><img src="./assets/play.svg" alt="play" id="play" /></button>
+				<button
+					><img src="./assets/forward.svg" alt="forward" id="forward"
+				/></button>
+				<progress id="seekbar" value="0" max="1"></progress>
+				<button
+					><img src="./assets/shuffle.svg" alt="shuffle" id="shuffle"
+				/></button>
+				<button
+					><img src="./assets/volume.svg" alt="volume" id="volume"
+				/></button>
+				<progress id="volume" value="0" max="1"></progress>
+			</div>
+			<audio src="" class="player"></audio>
+		</div>
+	</body>
+	<script src="./script.js"></script>
+</html>
