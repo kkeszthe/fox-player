@@ -1,74 +1,62 @@
-const mockList = [
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Ziklibrenbib/Peculate/st/Peculate_-_03_-_Existence_Through_Negation.mp3',
-		artist: 'Peculate',
-		title: 'Existence Through Negation',
-	},
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Ziklibrenbib/Peculate/st/Peculate_-_07_-_Vale_of_Tears.mp3',
-		artist: 'Peculate',
-		title: 'Vale of Tears',
-	},
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Ziklibrenbib/Peculate/st/Peculate_-_09_-_The_Immediate_Task.mp3',
-		artist: 'Peculate',
-		title: 'The Immediate Task',
-	},
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Ziklibrenbib/Peculate/st/Peculate_-_04_-_Opium_of_the_People.mp3',
-		artist: 'Peculate',
-		title: 'Opium of the People',
-	},
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/Ziklibrenbib/Don_Aman/Starving/Don_Aman_-_05_-_Kraken.mp3',
-		artist: 'Don Aman',
-		title: 'Kraken',
-	},
-	{
-		source:
-			'https://files.freemusicarchive.org/storage-freemusicarchive-org/music/ccCommunity/So_Far_As_I_Know/Fragments_Disclosure/So_Far_As_I_Know_-_05_-_Grimwood.mp3',
-		artist: 'So Far As I Know',
-		title: 'Grimwood',
-	},
-];
+const selectedTracklist = [];
+
+fetch('http://localhost:3000/playlist-tracks')
+	.then((res) => res.json())
+	.then((res) => {
+		res.playListTracks.forEach((track) => {
+			selectedTracklist.push(track);
+		});
+	})
+	.catch(console.log);
 
 function displayPlaylist() {
-	const songlist = document.querySelector('.right');
-	songlist.innerHTML = '';
-	mockList.forEach((song, index) => {
+	const tracklist = document.querySelector('.right');
+	tracklist.innerHTML = '';
+	displayPlaylistTracks(selectedTracklist, tracklist);
+}
+function displaySelectedTrack(track) {
+	const actual = document.querySelector('#actual');
+	actual.innerHTML = '';
+	const trackDetails = document.createElement('div');
+	const h2 = document.createElement('h2');
+	const p = document.createElement('p');
+	const buttons = document.createElement('div');
+	const favouriteBTN = document.createElement('img');
+	const addBTN = document.createElement('button');
+	h2.textContent = track.title;
+	p.textContent = track.artist;
+	favouriteBTN.setAttribute('src', 'assets/star.svg');
+	addBTN.textContent = '+';
+	trackDetails.appendChild(h2);
+	trackDetails.appendChild(p);
+	buttons.appendChild(addBTN);
+	buttons.appendChild(favouriteBTN);
+	actual.appendChild(trackDetails);
+	actual.appendChild(buttons);
+	const audio = document.querySelector('audio');
+	audio.setAttribute('src', track.source);
+}
+function displayPlaylistTracks(tracks, htmlElement) {
+	tracks.forEach((track, index) => {
 		const li = document.createElement('li');
-		li.textContent = song.title;
+		// const songTitle = document.createElement('p');
+		// const songDuration = document.createElement('p');
+		li.textContent = track.title;
 		li.addEventListener('click', (event) => {
 			const selectedItem = document.querySelector('.right .selected');
 			if (selectedItem) {
 				selectedItem.classList.toggle('selected');
 			}
 			li.classList.toggle('selected');
-			displaySelectedSong(song);
+			displaySelectedTrack(track);
 		});
 		if (index === 0) {
 			li.click();
 		}
-		songlist.appendChild(li);
+		htmlElement.appendChild(li);
 	});
 }
-function displaySelectedSong(song) {
-	const actual = document.querySelector('#actual');
-	actual.innerHTML = '';
-	const h2 = document.createElement('h2');
-	h2.textContent = song.title;
-	const p = document.createElement('p');
-	p.textContent = song.artist;
-	actual.appendChild(h2);
-	actual.appendChild(p);
-	const audio = document.querySelector('audio');
-	audio.setAttribute('src', song.source);
-}
+
 const playlists = document.querySelectorAll('.left li');
 
 playlists.forEach((playlist) => {
@@ -82,13 +70,18 @@ playlists.forEach((playlist) => {
 	});
 });
 
-const play = document.querySelector('#play');
-
+//Audio controllers
+const playBTN = document.querySelector('#play');
+const muteBTN = document.querySelector('#mute');
+const forwardBTN = document.querySelector('#forward');
+const rewinddBTN = document.querySelector('#rewind');
 const player = document.querySelector('audio');
+const volume = document.querySelector('#volume');
+const seekbar = document.querySelector('#seekbar');
 
-play.addEventListener('click', (event) => {
+playBTN.addEventListener('click', (event) => {
 	if (player.getAttribute('src') === '') {
-		alert('Select playlist and song');
+		alert('Select playlist and track');
 	} else if (play.classList.contains('pause')) {
 		player.pause();
 		play.setAttribute('src', './assets/play.svg');
@@ -101,9 +94,25 @@ play.addEventListener('click', (event) => {
 		play.classList.toggle('pause');
 	}
 });
-
+muteBTN.addEventListener('click', (event) => {
+	if (player.volume > 0) {
+		volume.setAttribute('value', 0);
+		player.volume = 0;
+	} else {
+		volume.setAttribute('value', 100);
+		player.volume = 1;
+	}
+});
 player.addEventListener('timeupdate', (event) => {
-	document
-		.querySelector('#seekbar')
-		.setAttribute('value', player.currentTime / player.duration);
+	seekbar.setAttribute('value', (player.currentTime / player.duration) * 300);
+});
+
+seekbar.addEventListener('click', (event) => {
+	seekbar.setAttribute('value', event.offsetX);
+	player.currentTime = (event.offsetX / 300) * player.duration;
+});
+
+volume.addEventListener('click', (event) => {
+	volume.setAttribute('value', event.offsetX);
+	player.volume = event.offsetX / 100;
 });
